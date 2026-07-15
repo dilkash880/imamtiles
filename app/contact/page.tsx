@@ -1,10 +1,63 @@
 'use client';
 
-import { motion } from "motion/react";
-import { SectionHeading } from "@/components/SectionHeading";
-import { ProMaxButton, ProMaxCard, ProMaxPanel } from "@/components/ui-pro-max";
+import { motion } from 'motion/react';
+import { useState } from 'react';
+import { SectionHeading } from '@/components/SectionHeading';
+import { ProMaxButton, ProMaxCard, ProMaxPanel } from '@/components/ui-pro-max';
 
 export default function ContactPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [type, setType] = useState('tile');
+  const [message, setMessage] = useState('');
+  const [images, setImages] = useState<FileList | null>(null);
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus('submitting');
+    setFeedback(null);
+
+    const formData = new FormData();
+    formData.append('name', name.trim());
+    formData.append('email', email.trim());
+    formData.append('phone', phone.trim());
+    formData.append('type', type);
+    formData.append('message', message.trim());
+
+    if (images) {
+      Array.from(images).forEach((file) => formData.append('images', file));
+    }
+
+    try {
+      const response = await fetch('/api/enquiries', {
+        method: 'POST',
+        body: formData,
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setStatus('error');
+        setFeedback(payload.error || 'Failed to send enquiry.');
+        return;
+      }
+
+      setStatus('success');
+      setFeedback('Your enquiry has been submitted. Our team will reply soon.');
+      setName('');
+      setEmail('');
+      setPhone('');
+      setType('tile');
+      setMessage('');
+      setImages(null);
+    } catch (error: any) {
+      setStatus('error');
+      setFeedback(error?.message || 'Something went wrong. Please try again.');
+    }
+  }
+
   return (
     <div className="space-y-8">
       <motion.section initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
@@ -49,24 +102,85 @@ export default function ContactPage() {
           />
         </ProMaxPanel>
         <ProMaxPanel>
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid gap-4 md:grid-cols-2">
               <label className="text-sm text-slate-600 dark:text-slate-300">
                 <span className="mb-2 block font-medium">Name</span>
-                <input className="w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70" placeholder="Your name" />
+                <input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70"
+                  placeholder="Your name"
+                />
               </label>
               <label className="text-sm text-slate-600 dark:text-slate-300">
                 <span className="mb-2 block font-medium">Phone</span>
-                <input className="w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70" placeholder="Your phone" />
+                <input
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70"
+                  placeholder="Your phone"
+                />
               </label>
             </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <label className="text-sm text-slate-600 dark:text-slate-300">
+                <span className="mb-2 block font-medium">Email</span>
+                <input
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70"
+                  placeholder="Your email"
+                  type="email"
+                />
+              </label>
+              <label className="text-sm text-slate-600 dark:text-slate-300">
+                <span className="mb-2 block font-medium">Product type</span>
+                <select
+                  value={type}
+                  onChange={(event) => setType(event.target.value)}
+                  className="w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70"
+                >
+                  <option value="tile">Tile</option>
+                  <option value="granite">Granite</option>
+                  <option value="marble">Marble</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+            </div>
+
             <label className="block text-sm text-slate-600 dark:text-slate-300">
               <span className="mb-2 block font-medium">Your requirement</span>
-              <textarea className="min-h-32 w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70" placeholder="Tell us what you need" />
+              <textarea
+                value={message}
+                onChange={(event) => setMessage(event.target.value)}
+                className="min-h-32 w-full rounded-2xl border border-slate-200/70 bg-slate-50/70 px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70"
+                placeholder="Tell us what you need"
+              />
             </label>
-            <ProMaxButton href="/contact" variant="primary">
-              Send enquiry
+
+            <label className="block text-sm text-slate-600 dark:text-slate-300">
+              <span className="mb-2 block font-medium">Upload images</span>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={(event) => setImages(event.target.files)}
+                className="w-full rounded-2xl border border-slate-200/70 bg-white px-4 py-3 outline-none dark:border-white/10 dark:bg-slate-800/70"
+              />
+            </label>
+
+            {feedback && (
+              <p className={`text-sm ${status === 'error' ? 'text-rose-600' : 'text-emerald-600'}`}>{feedback}</p>
+            )}
+
+            <ProMaxButton type="submit" disabled={status === 'submitting'} variant="primary">
+              {status === 'submitting' ? 'Sending…' : 'Send enquiry'}
             </ProMaxButton>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Already a registered customer? <a href="/enquiries/history" className="font-semibold text-slate-900 dark:text-white">View your enquiry history</a>.
+            </p>
           </form>
         </ProMaxPanel>
       </section>

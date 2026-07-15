@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "motion/react";
 import type { ReactNode } from "react";
 
@@ -6,6 +8,9 @@ type ProMaxButtonProps = {
   href?: string;
   className?: string;
   variant?: "primary" | "secondary" | "ghost" | "accent";
+  type?: 'button' | 'submit' | 'reset';
+  disabled?: boolean;
+  onClick?: () => void;
 };
 
 export function ProMaxButton({
@@ -13,6 +18,9 @@ export function ProMaxButton({
   href,
   className = "",
   variant = "primary",
+  type = 'button',
+  disabled = false,
+  onClick,
 }: ProMaxButtonProps) {
   const base =
     "relative inline-flex items-center justify-center overflow-hidden rounded-full px-5 py-3 text-sm font-semibold";
@@ -45,13 +53,16 @@ export function ProMaxButton({
   }
 
   return (
-    <motion.span
-      whileHover={{ scale: 1.03, y: -2, boxShadow: "0 18px 35px -18px rgba(15, 23, 42, 0.4)" }}
-      whileTap={{ scale: 0.98 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
+    <motion.button
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      whileHover={{ scale: disabled ? 1 : 1.03, y: disabled ? 0 : -2, boxShadow: disabled ? 'none' : '0 18px 35px -18px rgba(15, 23, 42, 0.4)' }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={classes}
     >
       {children}
-    </motion.span>
+    </motion.button>
   );
 }

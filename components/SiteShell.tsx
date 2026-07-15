@@ -12,6 +12,7 @@ const navItems = [
   { label: "Gallery", href: "/gallery" },
   { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
+  { label: "Wishlist", href: "/wishlist" },
 ];
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
