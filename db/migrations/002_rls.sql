@@ -35,10 +35,13 @@ create policy "self_profiles_update" on profiles
   for update using (id = auth.uid()) with check (id = auth.uid());
 
 -- Enquiries: allow authenticated users to insert enquiries tied to their uid
+-- (Note: the app's enquiry submission route uses the service role key, which
+-- bypasses RLS entirely, so this policy only matters if enquiries are ever
+-- inserted directly from a browser/anon client in the future.)
 create policy "insert_enquiry_authenticated" on enquiries
   for insert with check (
-    COALESCE(user_id::text, auth.uid()::text) = auth.uid()::text
-  ) using (true);
+    user_id IS NULL OR user_id = auth.uid()
+  );
 
 -- Enquiries: allow owner to read their enquiries
 create policy "select_enquiry_owner" on enquiries
@@ -60,7 +63,7 @@ create policy "wishlist_crud_own" on wishlists
 
 -- Contact messages: allow anonymous inserts
 create policy "public_insert_contact_messages" on contact_messages
-  for insert using (true);
+  for insert with check (true);
 
 -- Product images and enquiry images: allow server/service role to insert/manage
 -- Note: storage paths should be managed by server functions or admin users.

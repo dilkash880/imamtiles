@@ -1,7 +1,5 @@
 import { createClient } from './supabase/browser';
 
-const CUSTOMER_ROLE_ID = 2;
-
 function ensureBrowserClient() {
   const client = createClient();
   if (!client) {
@@ -12,17 +10,17 @@ function ensureBrowserClient() {
 
 export async function registerUser({ email, password, name, phone }: { email: string; password: string; name?: string; phone?: string }) {
   const client = ensureBrowserClient();
-  const { data, error } = await client.auth.signUp({ email, password });
+  // The profiles row is created server-side by the on_auth_user_created
+  // trigger (db/migrations/005_profile_auto_creation.sql), which reads
+  // name/phone from this metadata. A client-side insert here can't work:
+  // it would need to run before email confirmation, when the client has no
+  // session yet, and profiles has no RLS insert policy for that case.
+  const { data, error } = await client.auth.signUp({
+    email,
+    password,
+    options: { data: { name, phone } },
+  });
   if (error) throw error;
-
-  if (data?.user) {
-    try {
-      await client.from('profiles').upsert({ id: data.user.id, email, name, phone, role_id: CUSTOMER_ROLE_ID });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.warn('Failed to create profile record', e);
-    }
-  }
 
   return data;
 }
