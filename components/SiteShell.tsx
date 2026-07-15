@@ -97,6 +97,12 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
             <p className="font-semibold text-slate-950 dark:text-white">Contact</p>
             <div className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-300">
               <p>Phone: +91 7996078576</p>
+              <p>
+                Email:{" "}
+                <a href="mailto:info.dilkashimam@gmail.com" className="text-indigo-600 dark:text-indigo-300">
+                  info.dilkashimam@gmail.com
+                </a>
+              </p>
               <p>Address: Vill - Kairibirpur</p>
               <a href="https://wa.me/917996078576" target="_blank" rel="noreferrer" className="inline-flex text-indigo-600 dark:text-indigo-300">
                 WhatsApp us

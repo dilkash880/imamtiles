@@ -80,10 +80,12 @@ export default function ContactPage() {
               </h1>
               <ProMaxCard className="mt-6 space-y-4 p-5 text-sm text-slate-600 dark:text-slate-300">
                 <p><span className="font-semibold text-slate-950 dark:text-white">Phone:</span> +91 7996078576</p>
+                <p><span className="font-semibold text-slate-950 dark:text-white">Email:</span> info.dilkashimam@gmail.com</p>
                 <p><span className="font-semibold text-slate-950 dark:text-white">Location:</span> Vill - Kairibirpur</p>
                 <p><span className="font-semibold text-slate-950 dark:text-white">Working Hours:</span> Mon-Sat • 9:30 AM to 7:30 PM</p>
                 <div className="flex flex-wrap gap-3 pt-2">
                   <ProMaxButton href="tel:+917996078576" variant="primary">Call Now</ProMaxButton>
+                  <ProMaxButton href="mailto:info.dilkashimam@gmail.com" variant="accent">Email Us</ProMaxButton>
                   <ProMaxButton href="https://wa.me/917996078576" variant="accent">WhatsApp</ProMaxButton>
                   <ProMaxButton href="https://www.google.com/maps/search/?api=1&query=Vill+-+Kairibirpur" variant="secondary">Get Directions</ProMaxButton>
                 </div>

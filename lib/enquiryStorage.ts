@@ -33,11 +33,11 @@ export async function uploadEnquiryImage(file: Blob, filename: string) {
   return path;
 }
 
-export async function getSignedImageUrl(path: string) {
+export async function getSignedImageUrl(path: string, expiresInSeconds = 60 * 60) {
   if (!supabaseAdmin) return null;
   const { data, error } = await supabaseAdmin.storage
     .from(ENQUIRY_IMAGES_BUCKET)
-    .createSignedUrl(path, 60 * 60);
+    .createSignedUrl(path, expiresInSeconds);
 
   if (error || !data) {
     return null;

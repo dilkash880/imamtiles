@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import supabaseAdmin from '@/lib/supabaseServer';
 import { getServerProfile } from '@/lib/serverAuth';
-import { uploadEnquiryImage } from '@/lib/enquiryStorage';
-import { sendEnquiryUpdateNotification } from '@/lib/notifications';
+import { uploadEnquiryImage, getSignedImageUrl } from '@/lib/enquiryStorage';
+import { notifyShopOwnerOfNewEnquiry } from '@/lib/notifications';
+
+const EMAIL_LINK_EXPIRY_SECONDS = 60 * 60 * 24 * 7; // 7 days, so links in the notification email stay valid
 
 async function parseRequest(req: Request) {
   const contentType = req.headers.get('content-type') ?? '';
@@ -59,10 +61,9 @@ export async function POST(req: Request) {
   }
 
   let imageUploadFailures = 0;
+  const storagePaths: string[] = [];
 
   if (images.length > 0) {
-    const storagePaths: string[] = [];
-
     for (const image of images) {
       try {
         const path = await uploadEnquiryImage(image, image.name || 'enquiry-image');
@@ -81,11 +82,17 @@ export async function POST(req: Request) {
     }
   }
 
-  await sendEnquiryUpdateNotification({
+  const imageUrls = (
+    await Promise.all(storagePaths.map((path) => getSignedImageUrl(path, EMAIL_LINK_EXPIRY_SECONDS)))
+  ).filter((url): url is string => Boolean(url));
+
+  await notifyShopOwnerOfNewEnquiry({
+    name: name.trim() || null,
     email: email.trim() || null,
     phone: phone.trim() || null,
-    status: 'new',
-    replyMessage: null,
+    type: type.trim() || null,
+    message: message.trim() || null,
+    imageUrls,
   });
 
   return NextResponse.json({ success: true, enquiryId: enquiry.id, imageUploadFailures });
