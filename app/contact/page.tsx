@@ -14,11 +14,13 @@ export default function ContactPage() {
   const [images, setImages] = useState<FileList | null>(null);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [uploadWarning, setUploadWarning] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('submitting');
     setFeedback(null);
+    setUploadWarning(false);
 
     const formData = new FormData();
     formData.append('name', name.trim());
@@ -45,7 +47,15 @@ export default function ContactPage() {
       }
 
       setStatus('success');
-      setFeedback('Your enquiry has been submitted. Our team will reply soon.');
+      const failedCount = payload.imageUploadFailures ?? 0;
+      if (failedCount > 0) {
+        setUploadWarning(true);
+        setFeedback(
+          `Your enquiry has been submitted, but ${failedCount} image${failedCount > 1 ? 's' : ''} failed to upload. Please call or WhatsApp us the photos directly, or try submitting again.`
+        );
+      } else {
+        setFeedback('Your enquiry has been submitted. Our team will reply soon.');
+      }
       setName('');
       setEmail('');
       setPhone('');
@@ -172,7 +182,7 @@ export default function ContactPage() {
             </label>
 
             {feedback && (
-              <p className={`text-sm ${status === 'error' ? 'text-rose-600' : 'text-emerald-600'}`}>{feedback}</p>
+              <p className={`text-sm ${status === 'error' ? 'text-rose-600' : uploadWarning ? 'text-amber-600' : 'text-emerald-600'}`}>{feedback}</p>
             )}
 
             <ProMaxButton type="submit" disabled={status === 'submitting'} variant="primary">

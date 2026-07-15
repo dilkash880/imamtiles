@@ -58,6 +58,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: enquiryError?.message ?? 'Failed to submit enquiry' }, { status: 500 });
   }
 
+  let imageUploadFailures = 0;
+
   if (images.length > 0) {
     const storagePaths: string[] = [];
 
@@ -66,6 +68,7 @@ export async function POST(req: Request) {
         const path = await uploadEnquiryImage(image, image.name || 'enquiry-image');
         storagePaths.push(path);
       } catch (storageError) {
+        imageUploadFailures += 1;
         // eslint-disable-next-line no-console
         console.warn('Failed to upload enquiry image', storageError);
       }
@@ -85,5 +88,5 @@ export async function POST(req: Request) {
     replyMessage: null,
   });
 
-  return NextResponse.json({ success: true, enquiryId: enquiry.id });
+  return NextResponse.json({ success: true, enquiryId: enquiry.id, imageUploadFailures });
 }
