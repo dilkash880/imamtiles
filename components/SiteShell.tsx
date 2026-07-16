@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { ProMaxButton } from "@/components/ui-pro-max";
+import { WhatsAppWidget } from "@/components/WhatsAppWidget";
 
 const navItems = [
   { label: "Home", href: "/" },
@@ -210,17 +211,8 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
         </div>
       </footer>
 
-      <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-3">
-        <motion.a
-          href="https://wa.me/917996078576"
-          target="_blank"
-          rel="noreferrer"
-          whileHover={{ scale: 1.05 }}
-          className="flex items-center gap-2 rounded-full bg-emerald-500 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25"
-        >
-          <span className="text-base">💬</span>
-          WhatsApp
-        </motion.a>
+      <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+        <WhatsAppWidget />
         <ProMaxButton href="tel:+917996078576" variant="primary" className="flex items-center gap-2 px-4 py-3">
           <span className="text-base">📞</span>
           Call Now
