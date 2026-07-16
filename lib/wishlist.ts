@@ -1,3 +1,6 @@
+'use client';
+
+import { useCallback, useEffect, useState } from 'react';
 import { createClient } from './supabase/browser';
 
 function ensureBrowserClient() {
@@ -45,4 +48,40 @@ export async function toggleWishlist(productId: number): Promise<boolean> {
   const { error } = await client.from('wishlists').insert({ user_id: user.id, product_id: productId });
   if (error) throw error;
   return true;
+}
+
+export function useWishlist() {
+  const [wishlistIds, setWishlistIds] = useState<Set<number>>(new Set());
+  const [message, setMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    getWishlistProductIds()
+      .then(setWishlistIds)
+      .catch(() => setWishlistIds(new Set()));
+  }, []);
+
+  const handleToggle = useCallback(async (productId: number) => {
+    const wasWishlisted = wishlistIds.has(productId);
+    setWishlistIds((prev) => {
+      const next = new Set(prev);
+      if (wasWishlisted) next.delete(productId);
+      else next.add(productId);
+      return next;
+    });
+
+    try {
+      await toggleWishlist(productId);
+      setMessage(null);
+    } catch (err: any) {
+      setWishlistIds((prev) => {
+        const next = new Set(prev);
+        if (wasWishlisted) next.add(productId);
+        else next.delete(productId);
+        return next;
+      });
+      setMessage(err.message || 'Failed to update wishlist');
+    }
+  }, [wishlistIds]);
+
+  return { wishlistIds, message, toggleWishlist: handleToggle };
 }

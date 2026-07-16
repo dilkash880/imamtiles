@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { motion } from "motion/react";
 import type { PublicProduct } from "@/lib/publicProducts";
 import { ProMaxButton, ProMaxCard } from "@/components/ui-pro-max";
@@ -25,7 +26,7 @@ export function ProductCard({ product, isWishlisted = false, onToggleWishlist }:
       className="group"
     >
       <ProMaxCard className="overflow-hidden p-0">
-        <div className="relative h-56 overflow-hidden">
+        <Link href={`/products/${product.id}`} className="relative block h-56 overflow-hidden">
           {product.image ? (
             <motion.img
               src={product.image}
@@ -45,7 +46,11 @@ export function ProductCard({ product, isWishlisted = false, onToggleWishlist }:
           {onToggleWishlist && (
             <button
               type="button"
-              onClick={() => onToggleWishlist(product.id)}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                onToggleWishlist(product.id);
+              }}
               aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
               aria-pressed={isWishlisted}
               className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-rose-500 shadow-md backdrop-blur transition hover:scale-110 dark:bg-slate-900/90"
@@ -66,13 +71,17 @@ export function ProductCard({ product, isWishlisted = false, onToggleWishlist }:
               </svg>
             </button>
           )}
-        </div>
+        </Link>
         <div className="space-y-4 p-5">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-indigo-600 dark:text-indigo-300">
               {product.category}
             </p>
-            <h3 className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">{product.name}</h3>
+            <h3 className="mt-2 text-xl font-semibold text-slate-950 dark:text-white">
+              <Link href={`/products/${product.id}`} className="hover:text-indigo-600 dark:hover:text-indigo-300">
+                {product.name}
+              </Link>
+            </h3>
             {product.description && (
               <p className="mt-2 text-sm leading-7 text-slate-600 dark:text-slate-300">{product.description}</p>
             )}

@@ -46,6 +46,7 @@ export async function notifyShopOwnerOfNewEnquiry(enquiry: {
   type: string | null;
   message: string | null;
   imageUrls: string[];
+  productName?: string | null;
 }) {
   if (!SHOP_OWNER_EMAIL) {
     // eslint-disable-next-line no-console
@@ -67,12 +68,17 @@ export async function notifyShopOwnerOfNewEnquiry(enquiry: {
         .join('')}</ul>`
     : '<p><strong>Uploaded Images:</strong> None</p>';
 
+  const productHtml = enquiry.productName
+    ? `<p><strong>Product:</strong> ${escapeHtml(enquiry.productName)}</p>`
+    : '';
+
   const html = `
     <h2>New enquiry received</h2>
     <p><strong>Customer Name:</strong> ${safe.name}</p>
     <p><strong>Phone:</strong> ${safe.phone}</p>
     <p><strong>Email:</strong> ${safe.email}</p>
     <p><strong>Product Type:</strong> ${safe.type}</p>
+    ${productHtml}
     <p><strong>Requirement:</strong> ${safe.message}</p>
     ${imagesHtml}
     <p><strong>Date &amp; Time:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</p>

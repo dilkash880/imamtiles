@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ProductCard } from "@/components/ProductCard";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ProMaxPanel } from "@/components/ui-pro-max";
 import type { ProductAvailability, PublicProduct } from "@/lib/publicProducts";
-import { getWishlistProductIds, toggleWishlist } from "@/lib/wishlist";
+import { useWishlist } from "@/lib/wishlist";
 
 type ProductsBrowserProps = {
   products: PublicProduct[];
@@ -21,37 +21,7 @@ export function ProductsBrowser({ products, categories, sizes, finishes, availab
   const [selectedSize, setSelectedSize] = useState("All");
   const [selectedFinish, setSelectedFinish] = useState("All");
   const [selectedAvailability, setSelectedAvailability] = useState<'All' | ProductAvailability>("All");
-  const [wishlistIds, setWishlistIds] = useState<Set<number>>(new Set());
-  const [wishlistMessage, setWishlistMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    getWishlistProductIds()
-      .then(setWishlistIds)
-      .catch(() => setWishlistIds(new Set()));
-  }, []);
-
-  async function handleToggleWishlist(productId: number) {
-    const wasWishlisted = wishlistIds.has(productId);
-    setWishlistIds((prev) => {
-      const next = new Set(prev);
-      if (wasWishlisted) next.delete(productId);
-      else next.add(productId);
-      return next;
-    });
-
-    try {
-      await toggleWishlist(productId);
-      setWishlistMessage(null);
-    } catch (err: any) {
-      setWishlistIds((prev) => {
-        const next = new Set(prev);
-        if (wasWishlisted) next.add(productId);
-        else next.delete(productId);
-        return next;
-      });
-      setWishlistMessage(err.message || 'Failed to update wishlist');
-    }
-  }
+  const { wishlistIds, message: wishlistMessage, toggleWishlist: handleToggleWishlist } = useWishlist();
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {

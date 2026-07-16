@@ -11,6 +11,7 @@ async function parseRequest(req: Request) {
   if (contentType.includes('multipart/form-data')) {
     const formData = await req.formData();
     const images = formData.getAll('images').filter((item): item is File => item instanceof File);
+    const productId = formData.get('product_id');
 
     return {
       name: (formData.get('name') as string) ?? '',
@@ -19,6 +20,8 @@ async function parseRequest(req: Request) {
       message: (formData.get('message') as string) ?? '',
       type: (formData.get('type') as string) ?? 'general',
       images,
+      productId: productId ? Number(productId) : null,
+      productName: (formData.get('product_name') as string) ?? null,
     };
   }
 
@@ -30,6 +33,8 @@ async function parseRequest(req: Request) {
     message: payload.message ?? '',
     type: payload.type ?? 'general',
     images: Array.isArray(payload.images) ? payload.images : [],
+    productId: payload.product_id ? Number(payload.product_id) : null,
+    productName: payload.product_name ?? null,
   };
 }
 
@@ -40,7 +45,7 @@ export async function POST(req: Request) {
 
   const profile = await getServerProfile();
   const payload = await parseRequest(req);
-  const { name, email, phone, message, type, images } = payload;
+  const { name, email, phone, message, type, images, productId, productName } = payload;
 
   if (!name.trim() || !message.trim() || !email.trim() || !phone.trim()) {
     return NextResponse.json({ error: 'Name, email, phone, and message are required.' }, { status: 400 });
@@ -54,6 +59,7 @@ export async function POST(req: Request) {
     message: message.trim(),
     type: type.trim(),
     status: 'new',
+    product_id: productId,
   }).select('id, status').single();
 
   if (enquiryError || !enquiry) {
@@ -91,6 +97,7 @@ export async function POST(req: Request) {
     email: email.trim() || null,
     phone: phone.trim() || null,
     type: type.trim() || null,
+    productName: productName || null,
     message: message.trim() || null,
     imageUrls,
   });
