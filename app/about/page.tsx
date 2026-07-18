@@ -26,8 +26,8 @@ export default function AboutPage() {
               </p>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1487958449943-2429e8be8625?auto=format&fit=crop&w=1200&q=80"
-              alt="Premium tile showroom"
+              src="https://images.unsplash.com/photo-1698889670683-a40e1be44e46?auto=format&fit=crop&w=1200&q=80"
+              alt="Marble and tile slabs displayed in our showroom and stone yard"
               className="h-[320px] w-full rounded-[1.5rem] object-cover"
             />
           </div>
@@ -51,8 +51,8 @@ export default function AboutPage() {
         </ProMaxPanel>
         <ProMaxCard>
           <img
-            src="https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=1200&q=80"
-            alt="Luxury bathroom interior"
+            src="https://images.unsplash.com/photo-1701251786408-d0320ecaad8d?auto=format&fit=crop&w=1200&q=80"
+            alt="Luxury bathroom finished with premium marble walls and flooring"
             className="h-72 w-full rounded-[1.4rem] object-cover"
           />
           <p className="mt-5 text-lg leading-8 text-slate-600 dark:text-slate-300">
