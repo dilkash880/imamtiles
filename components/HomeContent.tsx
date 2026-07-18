@@ -85,8 +85,8 @@ export function HomeContent({ featuredProducts }: HomeContentProps) {
                   <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-sm text-emerald-300">New arrival</span>
                 </div>
                 <img
-                  src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"
-                  alt="Luxury tile collection"
+                  src="https://images.unsplash.com/photo-1758548157126-e4c0477f796e?auto=format&fit=crop&w=1200&q=80"
+                  alt="Modern home interior with premium polished marble floor tiles"
                   className="h-64 w-full rounded-[1rem] object-cover"
                 />
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
